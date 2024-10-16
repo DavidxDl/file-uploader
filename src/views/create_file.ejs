@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <%- include("./head.ejs"); %>
+  <body>
+    <main>
+        <%- include("./header.ejs"); %>
+        <form method="post" enctype="multipart/form-data">
+          <fieldset>
+            <label for="file">File:</label> 
+            <input type="file" id="file" name="file" />
+          </fieldset>
+          <fieldset>
+          <input type="submit" value="Upload" />
+        </fieldset>
+        </form>
+        <ul>
+        <% errors.forEach(function(error) { %>
+          <li style="color: red;"><%= error %></li>
+        <% }) %>
+        </ul>
+    </main>
+  </body>
+</html>

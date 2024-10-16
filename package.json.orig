@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
   "name": "file-uploader",
-=======
-  "name": "image-uploader",
->>>>>>> 75df7a9 (initial commit)
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -13,11 +9,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
-<<<<<<< HEAD
   "dependencies": {
     "express": "^4.21.0",
     "multer": "^1.4.5-lts.1",
-=======
   "devDependencies": {
     "@types/express-session": "^1.18.0",
     "@types/multer": "^1.4.12",
@@ -39,7 +33,6 @@
     "multer": "^1.4.5-lts.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
->>>>>>> 75df7a9 (initial commit)
     "prisma": "^5.20.0"
   }
 }

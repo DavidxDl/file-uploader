@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <%- include("./head.ejs"); %>
+
+  <body>
+    <%- include("./header.ejs"); %>
+      <main>
+  <% if (locals.user) {%>
+    <h2>WELCOME BACK <%= user.username %></h2>
+    <a href="/log-out">LOG OUT</a>
+    <a href="/files/new">Upload file</a>
+  <% } else { %>
+    <h1>please log in</h1>
+    <form action="/login" method="POST">
+      <fieldset>
+        <label for="username">Username</label>
+        <input id="username" name="username" placeholder="username" type="text" />
+      </fieldset>
+      <fieldset>
+        <label for="password">Password</label>
+        <input id="password" name="password" placeholder="password" type="password" />
+      </fieldset>
+        <fieldset>
+      <input type="submit" value="Log In"/>
+</fieldset>
+      <small>You don't have an account? <a href='/sign-up'>Sign up!</a></small>
+    </form>
+  <%}%>
+</main>
+  </body>
+</html>

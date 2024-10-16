@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%- include("./head.ejs"); %>
+  <body>
+    <%- include("./header.ejs"); %>
+    <main>
+    <h2>Login!</h2>
+    <form method="post">
+      <fieldset>
+        <label for="username">Username: </label>
+        <input placeholder="username" type="text" id="username" value="<%= typeof username !== 'undefined' ? username : '' %>" name="username"/>
+      </fieldset>
+      <fieldset>
+        <label for="password">Password: </label>
+        <input placeholder="password" type="password" id="password" value="<%= typeof password !== 'undefined' ? password : ''%>" name="password"/>
+      </fieldset>
+      <ul>
+        <% if (errors && errors.length > 0) { %>
+          <% errors.forEach(function(error){ %>
+            <li style="color:red"><%= error %></li>
+          <% }); %>
+        <% } %>
+      </ul>
+      <fieldset>
+        <input type="submit" value="Login"/>
+      </fieldset>
+      <small>You don't have an account? <a href="/sign-up">Sign up</a></small>
+    </form>
+    </main>
+  </body>
+</html>

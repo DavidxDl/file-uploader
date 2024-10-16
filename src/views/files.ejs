@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <%- include("./head.ejs"); %>
+  <body>
+    <main>
+        <%- include("./header.ejs"); %>
+        <ul>
+        <% files.forEach(function(file) { %>
+          <li><%= file %></li>
+        <% }) %>
+        </ul>
+    </main>
+  </body>
+</html>
