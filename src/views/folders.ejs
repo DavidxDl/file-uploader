@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <%- include("./head.ejs"); %>
+  <body>
+    <main>
+        <%- include("./header.ejs"); %>
+      <dialog>
+      </dialog>
+        <ul>
+        <% if (folders.length) { %>
+          <% folders.forEach(function(folder) { %>
+            <li class="folder-li">
+              <a href="/folders/<%= folder.id %>"><%= folder.name %></a>
+              <button class="delete-btn" data-folder-id="<%= folder.id %>" data-folder-name="<%= folder.name %>">Delete</button>
+            </li>
+          <% }) %>
+        <% } else { %>
+          <p>You have no folders!<p>
+          <a href="/folders/new">Create a Folder</a>
+        <% } %>
+        </ul>
+    </main>
+    <script src="/scripts/folders.js" type="module"></script>
+  </body>
+</html>

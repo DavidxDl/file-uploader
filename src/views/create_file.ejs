@@ -7,7 +7,18 @@
         <form method="post" enctype="multipart/form-data">
           <fieldset>
             <label for="file">File:</label> 
-            <input type="file" id="file" name="file" />
+            <input type="file" id="file" name="file" required />
+          </fieldset>
+          <fieldset>
+            <label for="folder">Folder:</label> 
+            <select  required id="folder" name="folder" >
+              <option value='' disabled selected>Folder</option>
+              <% if (folders.length) { %>
+                <% folders.forEach(function(folder) { %>
+                  <option value="<%= folder.name %>"><%= folder.name %></option>
+                <% }) %>
+            <% } %>
+            </select>
           </fieldset>
           <fieldset>
           <input type="submit" value="Upload" />

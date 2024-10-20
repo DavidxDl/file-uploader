@@ -21,7 +21,26 @@ model Session {
 }
 
 model User {
-  id       String @id @default(cuid())
-  username String @unique
+  id       String   @id @default(cuid())
+  username String   @unique
   password String
+  Folders  Folder[]
+  Files    File[]
+}
+
+model Folder {
+  id      String @id @default(uuid())
+  name    String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+  File    File[]
+}
+
+model File {
+  id       String @id @default(uuid())
+  name     String
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId String
+  owner    User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId  String
 }

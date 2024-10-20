@@ -7,6 +7,7 @@ import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import cors from "cors";
 
 import { router as filesRouter } from "./routes/files";
 import { router as foldersRouter } from "./routes/folders";
@@ -15,6 +16,7 @@ const prisma = new PrismaClient();
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

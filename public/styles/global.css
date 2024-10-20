@@ -66,6 +66,45 @@ fieldset > input {
   flex: 1 0 25px;
 }
 
+fieldset > select {
+  flex: 1 0 33px;
+}
+
 fieldset > input[type="submit"] {
   flex: 1 1 40px;
+}
+
+.folder-li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  & > span {
+    margin: auto;
+  }
+}
+
+dialog:modal {
+  display: grid;
+  place-items: center;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.delete-btn {
+  all: unset;
+  background-color: red;
+  font-weight: 900;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+
+  &:hover {
+    filter: saturate(0.7);
+  }
 }
