@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { Database } from "../../database.types";
 import { createClient } from "@supabase/supabase-js";
+import jwt from "jsonwebtoken";
 
 const supabaseUrl = "https://xsxfzuxsjnuxvtiximye.supabase.co";
 const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient<Database>(supabaseUrl, supabaseKey);
 
 const prisma = new PrismaClient();
 
@@ -49,13 +49,49 @@ export async function delete_folder(req: Request, res: Response) {
 }
 export async function folder_details(req: Request, res: Response) {
   console.log(req.params);
-  const folder = await prisma.folder.findUnique({
-    where: { id: req.params.folderId },
-  });
-  const files = await supabase.storage
-    .from("folders")
-    .list(`${req.user.id}/${folder.name}/`);
-  console.log(files);
+  const token = jwt.sign(
+    {
+      sub: req.user.id,
+      name: req.user.id,
+      iat: Math.floor(Date.now() / 1000),
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" },
+  );
 
-  return res.render("folder_details", { files: files.data, folder: folder });
+  const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+    global: {
+      headers: token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : null,
+    },
+  });
+
+  if (!req.user.id) return res.status(401).redirect("/");
+
+  try {
+    const folder = await prisma.folder.findUnique({
+      where: { id: req.params.folderId },
+    });
+    if (!folder) {
+      console.error("couldnt find folder");
+      return res.status(404).redirect("/");
+    }
+    console.log(folder.name);
+    const { error, data } = await supabase.storage
+      .from("folders")
+      .list(`${req.user.id}/${folder.name}/`);
+    console.log(data);
+    if (error) {
+      console.error("couldnt get files from folder", error);
+      return res.redirect("/");
+    }
+
+    return res.render("folder_details", { files: data, folder: folder });
+  } catch (error) {
+    console.error("couldnt get files from folder", error);
+    return res.status(400).redirect("/");
+  }
 }

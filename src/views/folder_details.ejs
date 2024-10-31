@@ -11,8 +11,9 @@
         <% if (files.length) { %>
           <% files.forEach(function(file) { %>
             <li class="folder-li">
-              <a href="/folders/<%= file.id %>"><%= file.name %></a>
+              <a href="/files/<%= file.name %>"><%= file.name %></a>
               <button class="delete-btn" data-folder-id="<%= file.id %>" data-folder-name="<%= file.name %>">Delete</button>
+          <a href="/files/<%= file.name %>?download=true" download>Download</a>
             </li>
           <% }) %>
         <% } else { %>
