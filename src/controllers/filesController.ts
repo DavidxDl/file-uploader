@@ -141,7 +141,12 @@ export async function file_details(req: Request, res: Response) {
 
     const { error, data } = await supabase.storage
       .from("folders")
-      .createSignedUrl(filePath, 60);
+      .createSignedUrl(
+        filePath,
+        60,
+        req.query.download === "true" ? { download: true } : null,
+      );
+
     if (error) {
       console.error("couldnt create signed url", error);
     }
@@ -152,3 +157,5 @@ export async function file_details(req: Request, res: Response) {
     return res.send("couldnt get publicUrl");
   }
 }
+
+export async function delete_file(req: Request, res: Response) {}

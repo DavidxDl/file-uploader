@@ -38,9 +38,49 @@ export async function create_folder_post(req: Request, res: Response) {
 
 export async function delete_folder(req: Request, res: Response) {
   const { folderId, folderName } = req.body;
+
+  const token = jwt.sign(
+    {
+      sub: req.user.id,
+      name: req.user.name,
+      iat: Math.floor(Date.now() / 1000),
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" },
+  );
+
+  const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+    global: {
+      headers: token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : null,
+    },
+  });
   console.log(folderId, folderName);
   try {
     await prisma.folder.delete({ where: { id: folderId } });
+
+    const folderPath = `${req.user.id}/${folderName}/`;
+    const { error, data } = await supabase.storage
+      .from("folders")
+      .list(folderPath);
+    if (error) {
+      console.error("Coulnd delete folder from supabase", error);
+      return res.status(400).redirect(`/folders`);
+    }
+
+    const filePaths = data.map(
+      (file) => `${req.user.id}/${folderName}/${file.name}`,
+    );
+
+    const deletion = await supabase.storage.from("folders").remove(filePaths);
+
+    if (deletion.error) {
+      console.error("coulnd delete files from folder");
+    }
+
     return res.status(200).json({ message: `folder: ${folderName} DELETED` });
   } catch (err) {
     console.error("couldnt delete folder", err);
@@ -83,6 +123,10 @@ export async function folder_details(req: Request, res: Response) {
     const { error, data } = await supabase.storage
       .from("folders")
       .list(`${req.user.id}/${folder.name}/`);
+
+    //data.forEach(async (file) => {
+    //  const {error,data} = await supabase.storage.from("folders").createSignedUrls
+    //})
     console.log(data);
     if (error) {
       console.error("couldnt get files from folder", error);
