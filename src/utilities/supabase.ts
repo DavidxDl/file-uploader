@@ -1,13 +1,13 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../../database.types";
+import { Express } from "express";
 import dotenv from "dotenv";
 dotenv.config();
 import jwt from "jsonwebtoken";
 
-export default function getSupabaseClient(user: {
-  id: string;
-  name: string;
-}): SupabaseClient<Database> {
+export default function getSupabaseClient(
+  user: Express.User,
+): SupabaseClient<Database> {
   const supabaseUrl = "https://xsxfzuxsjnuxvtiximye.supabase.co";
   const supabaseKey = process.env.SUPABASE_KEY;
   const token = jwt.sign(

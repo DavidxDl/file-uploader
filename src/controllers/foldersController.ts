@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { Database } from "../../database.types";
 import { createClient } from "@supabase/supabase-js";
 import jwt from "jsonwebtoken";
+import getSupabaseClient from "../utilities/supabase";
 
 const supabaseUrl = "https://xsxfzuxsjnuxvtiximye.supabase.co";
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -38,27 +39,10 @@ export async function create_folder_post(req: Request, res: Response) {
 
 export async function delete_folder(req: Request, res: Response) {
   const { folderId, folderName } = req.body;
-
-  const token = jwt.sign(
-    {
-      sub: req.user.id,
-      name: req.user.name,
-      iat: Math.floor(Date.now() / 1000),
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" },
-  );
-
-  const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
-    global: {
-      headers: token
-        ? {
-            Authorization: `Bearer ${token}`,
-          }
-        : null,
-    },
-  });
   console.log(folderId, folderName);
+
+  const supabase = getSupabaseClient(req.user);
+
   try {
     await prisma.folder.delete({ where: { id: folderId } });
 
@@ -89,27 +73,9 @@ export async function delete_folder(req: Request, res: Response) {
 }
 export async function folder_details(req: Request, res: Response) {
   console.log(req.params);
-  const token = jwt.sign(
-    {
-      sub: req.user.id,
-      name: req.user.id,
-      iat: Math.floor(Date.now() / 1000),
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" },
-  );
-
-  const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
-    global: {
-      headers: token
-        ? {
-            Authorization: `Bearer ${token}`,
-          }
-        : null,
-    },
-  });
-
   if (!req.user.id) return res.status(401).redirect("/");
+
+  const supabase = getSupabaseClient(req.user);
 
   try {
     const folder = await prisma.folder.findUnique({

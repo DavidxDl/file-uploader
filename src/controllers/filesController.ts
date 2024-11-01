@@ -6,6 +6,7 @@ dotenv.config();
 
 import jwt from "jsonwebtoken";
 import { createClient } from "@supabase/supabase-js";
+import getSupabaseClient from "../utilities/supabase";
 
 const supabaseUrl = "https://xsxfzuxsjnuxvtiximye.supabase.co";
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -31,28 +32,11 @@ export async function create_file_get(req: Request, res: Response) {
 export async function create_file_post(req: Request, res: Response) {
   console.log(req.file);
   console.log(req.body);
+
   const folder: string = req.body.folder;
   if (!folder) return res.redirect("/files/new");
 
-  const token = jwt.sign(
-    {
-      sub: req.user.id,
-      name: req.user.id,
-      iat: Math.floor(Date.now() / 1000),
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" },
-  );
-
-  const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
-    global: {
-      headers: token
-        ? {
-            Authorization: `Bearer ${token}`,
-          }
-        : null,
-    },
-  });
+  const supabase = getSupabaseClient(req.user);
 
   try {
     const folder_info = await prisma.folder.findFirst({
@@ -100,25 +84,9 @@ export async function create_file_post(req: Request, res: Response) {
 export async function file_details(req: Request, res: Response) {
   console.log(req.params);
   console.log(req.query);
-  const token = jwt.sign(
-    {
-      sub: req.user.id,
-      name: req.user.id,
-      iat: Math.floor(Date.now() / 1000),
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" },
-  );
 
-  const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
-    global: {
-      headers: token
-        ? {
-            Authorization: `Bearer ${token}`,
-          }
-        : null,
-    },
-  });
+  const supabase = getSupabaseClient(req.user);
+
   try {
     const file = await prisma.file.findFirst({
       where: { name: req.params.fileName },
@@ -158,4 +126,14 @@ export async function file_details(req: Request, res: Response) {
   }
 }
 
-export async function delete_file(req: Request, res: Response) {}
+export async function delete_file(req: Request, res: Response) {
+  const supabase = getSupabaseClient(req.user);
+
+  try {
+  } catch (error) {
+    console.error("couldnt delete file", error);
+    return res
+      .status(400)
+      .json({ message: `couldnt delete file`, error: error });
+  }
+}
