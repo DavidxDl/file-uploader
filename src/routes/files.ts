@@ -9,6 +9,7 @@ import {
   create_file_get,
   create_file_post,
   file_details,
+  delete_file,
 } from "../controllers/filesController";
 
 export const router = express.Router();
@@ -18,5 +19,7 @@ router.get("/", index);
 router.get("/new", loginRequired, create_file_get);
 
 router.post("/new", loginRequired, upload.single("file"), create_file_post);
+
+router.post("/delete", loginRequired, delete_file);
 
 router.get("/:fileName", loginRequired, file_details);

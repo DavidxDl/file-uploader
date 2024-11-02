@@ -2,10 +2,15 @@
   <h2 style="text-align: center;">File Uploader</h2>
   <nav>
     <ul>
+      <% if (locals.user) { %>
       <li><a href="/">Home</a></li>
-      <li><a href="/files/new">Upload</a></li>
-      <li><a href="/folders">Folders</a></li>
-      <li><a href="/folders/new">Create Folder</a></li>
+        <li><a href="/files/new">Upload</a></li>
+        <li><a href="/folders">Folders</a></li>
+        <li><a href="/folders/new">Create Folder</a></li>
+      <% } else { %>
+        <li><a href="/login">Log in</a></li>
+        <li><a href="/sign-up">Sign Up</a></li>
+      <% } %>
     </ul>
   </nav>
 </header>

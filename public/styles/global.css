@@ -95,7 +95,7 @@ dialog::backdrop {
   backdrop-filter: blur(5px);
 }
 
-.delete-btn {
+.btn-danger {
   all: unset;
   background-color: red;
   font-weight: 900;
@@ -106,5 +106,86 @@ dialog::backdrop {
 
   &:hover {
     filter: saturate(0.7);
+  }
+}
+
+.btn-ghost {
+  all: unset;
+  border: 1px solid darkgray;
+  font-weight: 900;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+
+  &:hover {
+    filter: saturate(0.7);
+  }
+}
+
+.btn-white {
+  all: unset;
+  font-weight: 700;
+  background: white;
+  color: black;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 1px 3px 0px #b0b0b0;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    filter: contrast(0.8);
+  }
+
+  &:active {
+    box-shadow: 1px 1px 0px #b0b0b0;
+  }
+}
+
+.btn-green {
+  all: unset;
+  font-weight: 700;
+  background: green;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 1px 3px 0px darkgreen;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    filter: contrast(0.8);
+  }
+
+  &:active {
+    box-shadow: 1px 1px 0px darkgreen;
+  }
+}
+
+thead {
+  background: #282828;
+}
+
+tr > th,
+tr > td {
+  padding: 10px 20px;
+  font-weight: 900;
+}
+
+table tr:nth-child(even) {
+  background-color: #ffffff0a;
+}
+
+@media screen and (max-width: 768px) {
+  th {
+    font-size: 0.8rem;
+  }
+  tr > th,
+  tr > td {
+    padding: 10px 0;
+  }
+  table {
+    font-size: 0.5rem;
   }
 }

@@ -11,12 +11,13 @@
           <% folders.forEach(function(folder) { %>
             <li class="folder-li">
               <a href="/folders/<%= folder.id %>"><%= folder.name %></a>
-              <button class="delete-btn" data-folder-id="<%= folder.id %>" data-folder-name="<%= folder.name %>">Delete</button>
+              <button class="btn-danger" data-folder-id="<%= folder.id %>" data-folder-name="<%= folder.name %>">Delete</button>
+              <button class="btn-ghost" data-folder-id="<%= folder.id %>" data-folder-name="<%= folder.name %>">Rename</button>
             </li>
           <% }) %>
         <% } else { %>
           <p>You have no folders!<p>
-          <a href="/folders/new">Create a Folder</a>
+          <a href="/folders/new" class="btn-green">Create a Folder</a>
         <% } %>
         </ul>
     </main>

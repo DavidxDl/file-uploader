@@ -8,14 +8,18 @@ import {
   index,
   create_folder_post,
   delete_folder,
+  rename_folder,
 } from "../controllers/foldersController";
+import loginRequired from "../utilities/loginRequired";
 
 router.get("/", index);
 
-router.get("/new", create_folder_get);
+router.get("/new", loginRequired, create_folder_get);
 
-router.post("/new", create_folder_post);
+router.post("/new", loginRequired, create_folder_post);
 
-router.post("/delete", delete_folder);
+router.post("/delete", loginRequired, delete_folder);
 
-router.get("/:folderId", folder_details);
+router.post("/rename", loginRequired, rename_folder);
+
+router.get("/:folderId", loginRequired, folder_details);

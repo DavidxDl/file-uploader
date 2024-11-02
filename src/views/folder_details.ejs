@@ -7,20 +7,32 @@
       <dialog>
       </dialog>
       <h1><%= folder.name %></h1>
-        <ul>
-        <% if (files.length) { %>
-          <% files.forEach(function(file) { %>
-            <li class="folder-li">
-              <a href="/files/<%= file.name %>"><%= file.name %></a>
-              <button class="delete-btn" data-folder-id="<%= file.id %>" data-folder-name="<%= file.name %>">Delete</button>
-          <a href="/files/<%= file.name %>?download=true" download>Download</a>
-            </li>
-          <% }) %>
-        <% } else { %>
-          <p>You have no folders!<p>
-          <a href="/folders/new">Create a Folder</a>
-        <% } %>
-        </ul>
+      <table>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Created At</th>
+          <th scope="col">Delete</th>
+          <th scope="col">Rename</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% if (files.length) { %>
+        <% files.forEach(function(file) { %>
+          <tr>
+            <th scope="row"><a href="/files/<%= file.name %>"><%= file.name %></a></th>
+            <td><%= file.created_at %></td>
+            <td><button class="btn-danger" data-file-name="<%= file.name %>" data-folder-name="<%= folder.name %>" data-file-id="<%= file.id %>">Delete</button></td>
+            <td><a class="btn-green" href="/files/<%= file.name %>?download=true" download>Download</a></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <p>Theres no files!</p>
+        <a class="btn-green"  href="/files/new">Create a File</a>
+      <% } %>
+      </tbody>>
+      </table>
     </main>
+    <script src="/scripts/files.js" type="module"></script>
   </body>
 </html>

@@ -1,12 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { Database } from "../../database.types";
-import { createClient } from "@supabase/supabase-js";
-import jwt from "jsonwebtoken";
 import getSupabaseClient from "../utilities/supabase";
-
-const supabaseUrl = "https://xsxfzuxsjnuxvtiximye.supabase.co";
-const supabaseKey = process.env.SUPABASE_KEY;
 
 const prisma = new PrismaClient();
 
@@ -86,14 +80,13 @@ export async function folder_details(req: Request, res: Response) {
       return res.status(404).redirect("/");
     }
     console.log(folder.name);
-    const { error, data } = await supabase.storage
+    let { error, data } = await supabase.storage
       .from("folders")
       .list(`${req.user.id}/${folder.name}/`);
 
-    //data.forEach(async (file) => {
-    //  const {error,data} = await supabase.storage.from("folders").createSignedUrls
-    //})
     console.log(data);
+    if (data.length === 1 && data[0].name === ".emptyFolderPlaceholder")
+      data = [];
     if (error) {
       console.error("couldnt get files from folder", error);
       return res.redirect("/");
@@ -103,5 +96,105 @@ export async function folder_details(req: Request, res: Response) {
   } catch (error) {
     console.error("couldnt get files from folder", error);
     return res.status(400).redirect("/");
+  }
+}
+
+export async function rename_folder(req: Request, res: Response) {
+  const supabase = getSupabaseClient(req.user);
+  try {
+    const { folderName, folderId, newFolderName } = req.body;
+    console.log(folderName, folderId, newFolderName);
+
+    if (!folderName || !folderId || !newFolderName) {
+      console.error("bad request necessary fields missing from request");
+      return res.status(400).redirect("/");
+    }
+
+    // Update folder name in database
+    const folder = await prisma.folder.update({
+      where: { id: folderId },
+      data: { name: newFolderName },
+    });
+    console.log("db folder Updated:", folder);
+
+    // List all files in the folder
+    const path = `${req.user.id}/${folderName}`;
+    const { error: listError, data: files } = await supabase.storage
+      .from("folders")
+      .list(path);
+
+    if (listError) {
+      console.error("couldn't list files from folder", listError);
+      return res
+        .status(400)
+        .json({ message: "couldn't list files from folder" });
+    }
+
+    // If no files, we're done
+    if (!files || files.length === 0) {
+      return res.status(200).json({ message: "folder renamed successfully" });
+    }
+
+    // Move each file to the new folder
+    const movePromises = files.map(async (file) => {
+      const originalPath = `${req.user.id}/${folderName}/${file.name}`;
+      const newPath = `${req.user.id}/${newFolderName}/${file.name}`;
+
+      console.log(`Moving file from ${originalPath} to ${newPath}`);
+
+      try {
+        // First copy the file to new location
+        const { error: copyError, data: copyData } = await supabase.storage
+          .from("folders")
+          .copy(originalPath, newPath);
+
+        if (copyError) {
+          console.error(`Error copying file ${file.name}:`, copyError);
+          return { success: false, file: file.name, error: copyError };
+        }
+
+        // Then remove the original file
+        const { error: removeError } = await supabase.storage
+          .from("folders")
+          .remove([originalPath]);
+
+        if (removeError) {
+          console.error(
+            `Error removing original file ${file.name}:`,
+            removeError,
+          );
+          return { success: false, file: file.name, error: removeError };
+        }
+
+        return { success: true, file: file.name };
+      } catch (error) {
+        console.error(`Error processing file ${file.name}:`, error);
+        return { success: false, file: file.name, error };
+      }
+    });
+
+    // Wait for all file operations to complete
+    const results = await Promise.all(movePromises);
+
+    // Check if any operations failed
+    const failures = results.filter((result) => !result.success);
+    if (failures.length > 0) {
+      console.error("Some files failed to move:", failures);
+      return res.status(207).json({
+        message: "partial success - some files failed to move",
+        failures,
+      });
+    }
+
+    return res.status(200).json({
+      message: "folder renamed successfully",
+      filesProcessed: results.length,
+    });
+  } catch (error) {
+    console.error("Error in rename_folder:", error);
+    return res.status(500).json({
+      message: "internal server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }

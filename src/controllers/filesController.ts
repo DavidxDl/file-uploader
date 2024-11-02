@@ -1,15 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { Database } from "../../database.types";
 import dotenv from "dotenv";
 dotenv.config();
 
-import jwt from "jsonwebtoken";
-import { createClient } from "@supabase/supabase-js";
 import getSupabaseClient from "../utilities/supabase";
-
-const supabaseUrl = "https://xsxfzuxsjnuxvtiximye.supabase.co";
-const supabaseKey = process.env.SUPABASE_KEY;
 
 const prisma = new PrismaClient();
 
@@ -17,10 +11,6 @@ export async function index(req: Request, res: Response) {
   const files = ["file", "file", "file"];
   return res.render("files", { files: files });
 }
-//  global: {
-//      headers: accessToken ? {
-//        Authorization: `Bearer ${accessToken}`,
-//      } : null,
 
 export async function create_file_get(req: Request, res: Response) {
   const folders = await prisma.folder.findMany({
@@ -74,7 +64,7 @@ export async function create_file_post(req: Request, res: Response) {
     });
     console.log("file created", file);
 
-    return res.redirect("/");
+    return res.redirect(`/folders/${folder_info.id}/`);
   } catch (error) {
     console.error("Error during the file upload process", error);
     return res.status(500).redirect("/files/new");
@@ -130,6 +120,40 @@ export async function delete_file(req: Request, res: Response) {
   const supabase = getSupabaseClient(req.user);
 
   try {
+    const { fileName, folderName, fileId } = req.body;
+    console.log(fileName, folderName, fileId);
+    if (!fileName || !folderName) {
+      console.error("File Name or Folder Name missing");
+      return res
+        .status(400)
+        .json({ message: "missing folder name or file name" });
+    } else if (!fileId) {
+      console.error("File Id missing");
+      return res.status(400).json({ message: "missing file id " });
+    }
+
+    const dbFile = await prisma.file.findFirst({ where: { name: fileName } });
+    console.log(`file found to delete : ${dbFile}`);
+
+    const path = `${req.user.id}/${folderName}/${fileName}`;
+    console.log(`file path : ${path}`);
+
+    const { error, data } = await supabase.storage
+      .from("folders")
+      .remove([path]);
+
+    console.log(`supabase removed file:`, data);
+
+    const file = await prisma.file.delete({ where: { id: dbFile.id } });
+
+    console.log(`prisma file deleted: `, file);
+
+    if (error) {
+      console.error("couldnt delete file", error);
+      return res.status(400).json({ error: "couldnt delete file" });
+    }
+
+    return res.status(200).json("File deleted");
   } catch (error) {
     console.error("couldnt delete file", error);
     return res
