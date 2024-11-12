@@ -13,7 +13,6 @@
           <th scope="col">Name</th>
           <th scope="col">Created At</th>
           <th scope="col">Delete</th>
-          <th scope="col">Rename</th>
         </tr>
       </thead>
       <tbody>
@@ -22,8 +21,15 @@
           <tr>
             <th scope="row"><a href="/files/<%= file.name %>"><%= file.name %></a></th>
             <td><%= file.created_at %></td>
-            <td><button class="btn-danger" data-file-name="<%= file.name %>" data-folder-name="<%= folder.name %>" data-file-id="<%= file.id %>">Delete</button></td>
-            <td><a class="btn-green" href="/files/<%= file.name %>?download=true" download>Download</a></td>
+            <td>
+              <button popovertarget="<%= file.name %>" class="showOptions">:</button>
+              <div popover id="<%= file.name %>" class="options">
+                <ul>
+                  <li><a href="#">Delete</a></li>
+                  <li><a href="#">Download</a></li>
+              <div>
+
+            </td>
           </tr>
         <% }) %>
       <% } else { %>
