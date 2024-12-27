@@ -11,12 +11,19 @@ import cors from "cors";
 
 import { router as filesRouter } from "./routes/files";
 import { router as foldersRouter } from "./routes/folders";
+import loginRequired from "./utilities/loginRequired";
 
 const prisma = new PrismaClient();
 
 const app = express();
 
-app.use(cors());
+// Configure CORS with specific options
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Your React app's exact URL
+    credentials: true, // This is crucial for sending cookies
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -136,13 +143,42 @@ app.get("/login", (req, res) => {
   return res.render("login", { errors: [] });
 });
 
-app.post(
-  "/login",
-  passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/",
-  }),
-);
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      // Internal server error
+      return res
+        .status(500)
+        .json({ success: false, message: "An error occurred", error: err });
+    }
+    if (!user) {
+      // Authentication failed
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: info.message || "Invalid credentials",
+        });
+    }
+    // Log the user in
+    req.login(user, (loginErr) => {
+      if (loginErr) {
+        return res
+          .status(500)
+          .json({ success: false, message: "Login failed", error: loginErr });
+      }
+      // Authentication successful
+      return res.status(200).json({
+        success: true,
+        user: { id: user.id, username: user.username },
+      });
+    });
+  })(req, res, next); // Pass `req`, `res`, and `next` to the middleware
+});
+
+app.get("/get_user", loginRequired, (req, res) => {
+  return res.json(req.user);
+});
 
 app.get("/log-out", (req, res, next) => {
   req.logout((err) => {
