@@ -5,10 +5,15 @@ import getSupabaseClient from "../utilities/supabase";
 const prisma = new PrismaClient();
 
 export async function index(req: Request, res: Response) {
+  console.log(req.user);
+
+  if (!req.isAuthenticated()) {
+    return res.status(403).json({ message: "Not logged in" });
+  }
   const folders = await prisma.folder.findMany({
     where: { ownerId: req.user.id },
   });
-  return res.render("folders", { folders: folders });
+  return res.status(200).json(folders);
 }
 
 export function create_folder_get(req: Request, res: Response) {
@@ -92,7 +97,7 @@ export async function folder_details(req: Request, res: Response) {
       return res.redirect("/");
     }
 
-    return res.render("folder_details", { files: data, folder: folder });
+    return res.json(data);
   } catch (error) {
     console.error("couldnt get files from folder", error);
     return res.status(400).redirect("/");

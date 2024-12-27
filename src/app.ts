@@ -153,12 +153,10 @@ app.post("/login", (req, res, next) => {
     }
     if (!user) {
       // Authentication failed
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: info.message || "Invalid credentials",
-        });
+      return res.status(401).json({
+        success: false,
+        message: info.message || "Invalid credentials",
+      });
     }
     // Log the user in
     req.login(user, (loginErr) => {
@@ -176,7 +174,9 @@ app.post("/login", (req, res, next) => {
   })(req, res, next); // Pass `req`, `res`, and `next` to the middleware
 });
 
-app.get("/get_user", loginRequired, (req, res) => {
+app.get("/get_user", (req, res) => {
+  console.log("returning user");
+  console.table(req.user);
   return res.json(req.user);
 });
 
