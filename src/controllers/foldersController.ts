@@ -89,6 +89,10 @@ export async function folder_details(req: Request, res: Response) {
       .from("folders")
       .list(`${req.user.id}/${folder.name}/`);
 
+    if (!data) {
+      return console.log("No files in folder");
+    }
+
     console.log(data);
     if (data.length === 1 && data[0].name === ".emptyFolderPlaceholder")
       data = [];

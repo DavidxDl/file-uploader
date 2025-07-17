@@ -22,7 +22,7 @@ app.use(
   cors({
     origin: "http://localhost:5173", // Your React app's exact URL
     credentials: true, // This is crucial for sending cookies
-  }),
+  })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -44,7 +44,7 @@ app.use(
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),
-  }),
+  })
 );
 app.use(passport.session());
 
@@ -66,8 +66,8 @@ passport.use(
       } catch (err) {
         return done(err);
       }
-    },
-  ),
+    }
+  )
 );
 
 passport.serializeUser((user: User, done) => {
@@ -106,7 +106,7 @@ app.post("/sign-up", async (req, res) => {
   });
 
   if (password !== repeat_password) {
-    return res.render("sign-up", {
+    return res.json({
       errors: ["passwords don't match!"],
       username: username,
       password: password,
@@ -115,7 +115,7 @@ app.post("/sign-up", async (req, res) => {
   }
 
   if (username_exist.length) {
-    return res.render("sign-up", {
+    return res.json({
       errors: ["username already exist"],
       username: username,
       password: password,
@@ -136,7 +136,7 @@ app.post("/sign-up", async (req, res) => {
     });
   });
 
-  return res.redirect("/");
+  return res.json({ success: true });
 });
 
 app.get("/login", (req, res) => {
