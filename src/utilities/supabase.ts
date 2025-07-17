@@ -6,9 +6,9 @@ dotenv.config();
 import jwt from "jsonwebtoken";
 
 export default function getSupabaseClient(
-  user: Express.User,
+  user: Express.User
 ): SupabaseClient<Database> {
-  const supabaseUrl = "https://xsxfzuxsjnuxvtiximye.supabase.co";
+  const supabaseUrl = "https://bcdvpdlrbjfxhizyrkoy.supabase.co";
   const supabaseKey = process.env.SUPABASE_KEY;
   const token = jwt.sign(
     {
@@ -17,7 +17,7 @@ export default function getSupabaseClient(
       iat: Math.floor(Date.now() / 1000),
     },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" },
+    { expiresIn: "1h" }
   );
 
   const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
