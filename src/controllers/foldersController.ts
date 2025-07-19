@@ -55,7 +55,7 @@ export async function delete_folder(req: Request, res: Response) {
     }
 
     const filePaths = data.map(
-      (file) => `${req.user.id}/${folderName}/${file.name}`
+      (file) => `${req.user.id}/${folderName}/${file.name}`,
     );
 
     const deletion = await supabase.storage.from("folders").remove(filePaths);
@@ -89,16 +89,17 @@ export async function folder_details(req: Request, res: Response) {
       .from("folders")
       .list(`${req.user.id}/${folder.name}/`);
 
-    if (!data) {
-      return console.log("No files in folder");
-    }
+    console.log(`data: ${data}`);
 
-    console.log(data);
-    if (data.length === 1 && data[0].name === ".emptyFolderPlaceholder")
-      data = [];
+    if (data === null) return res.send([]);
     if (error) {
       console.error("couldnt get files from folder", error);
       return res.redirect("/");
+    }
+
+    if (!data.length) {
+      console.log("No files in folder");
+      return res.send(data);
     }
 
     for (const file of data) {
@@ -180,7 +181,7 @@ export async function rename_folder(req: Request, res: Response) {
         if (removeError) {
           console.error(
             `Error removing original file ${file.name}:`,
-            removeError
+            removeError,
           );
           return { success: false, file: file.name, error: removeError };
         }

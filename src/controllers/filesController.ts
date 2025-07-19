@@ -41,7 +41,7 @@ export async function create_file_post(req: Request, res: Response) {
     const { error, data } = await supabase.storage
       .from("folders")
       .upload(
-        `${req.user.id}/${folder}/${req.file.originalname}`,
+        `${req.user.id}/${folder_info.name}/${req.file.originalname}`,
         req.file.buffer,
         {
           contentType: req.file.mimetype,

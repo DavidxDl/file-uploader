@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 export default function getSupabaseClient(
   user: Express.User,
 ): SupabaseClient<Database> {
-  const supabaseUrl = "https://xsxfzuxsjnuxvtiximye.supabase.co";
+  const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_KEY;
   const token = jwt.sign(
     {
