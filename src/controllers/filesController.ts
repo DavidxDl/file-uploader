@@ -64,7 +64,7 @@ export async function create_file_post(req: Request, res: Response) {
     });
     console.log("file created", file);
 
-    return res.redirect(`/folders/${folder_info.id}/`);
+    return res.redirect(`http://localhost:5173/`);
   } catch (error) {
     console.error("Error during the file upload process", error);
     return res.status(500).redirect("/files/new");

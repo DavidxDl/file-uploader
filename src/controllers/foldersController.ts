@@ -21,6 +21,7 @@ export function create_folder_get(req: Request, res: Response) {
 }
 
 export async function create_folder_post(req: Request, res: Response) {
+  console.log(req.body.folder_name);
   const folder_name: string = req.body.folder_name;
 
   if (!folder_name) {
@@ -33,7 +34,7 @@ export async function create_folder_post(req: Request, res: Response) {
     data: { name: folder_name, ownerId: req.user.id },
   });
   console.log(folder);
-  return res.status(200).redirect("/folders");
+  return res.status(200).send({ success: true });
 }
 
 export async function delete_folder(req: Request, res: Response) {
@@ -50,8 +51,11 @@ export async function delete_folder(req: Request, res: Response) {
       .from("folders")
       .list(folderPath);
     if (error) {
-      console.error("Coulnd delete folder from supabase", error);
-      return res.status(400).redirect(`/folders`);
+      console.error("Coulnd delete folder from supabase", error.message);
+    }
+
+    if (!data || !data?.length) {
+      return res.send({ success: true });
     }
 
     const filePaths = data.map(
@@ -64,7 +68,7 @@ export async function delete_folder(req: Request, res: Response) {
       console.error("coulnd delete files from folder");
     }
 
-    return res.status(200).json({ message: `folder: ${folderName} DELETED` });
+    return res.status(200).json({ success: true });
   } catch (err) {
     console.error("couldnt delete folder", err);
     return res.status(401).json({ message: "coulnd delete folder" });
