@@ -34,7 +34,7 @@ export async function create_folder_post(req: Request, res: Response) {
     data: { name: folder_name, ownerId: req.user.id },
   });
   console.log(folder);
-  return res.status(200).send({ success: true });
+  return res.status(200).send({ success: true, folder: folder });
 }
 
 export async function delete_folder(req: Request, res: Response) {
@@ -156,7 +156,7 @@ export async function rename_folder(req: Request, res: Response) {
 
     // If no files, we're done
     if (!files || files.length === 0) {
-      return res.status(200).json({ message: "folder renamed successfully" });
+      return res.status(200).json({ success: true });
     }
 
     // Move each file to the new folder
@@ -211,7 +211,7 @@ export async function rename_folder(req: Request, res: Response) {
     }
 
     return res.status(200).json({
-      message: "folder renamed successfully",
+      success: true,
       filesProcessed: results.length,
     });
   } catch (error) {
