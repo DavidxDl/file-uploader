@@ -153,7 +153,7 @@ export async function delete_file(req: Request, res: Response) {
       return res.status(400).json({ error: "couldnt delete file" });
     }
 
-    return res.status(200).json("File deleted");
+    return res.status(200).json({ success: true, message: "File deleted" });
   } catch (error) {
     console.error("couldnt delete file", error);
     return res
