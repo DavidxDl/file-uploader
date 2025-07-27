@@ -7,6 +7,85 @@ import getSupabaseClient from "../utilities/supabase";
 
 const prisma = new PrismaClient();
 
+export async function get_shared_files(req: Request, res: Response) {
+  console.log(req.url);
+  console.log(req.user.id);
+  const supabase = getSupabaseClient(req.user);
+  try {
+    const { error, data } = await supabase.storage
+      .from("share")
+      .list(`${req.user.id}/`);
+
+    console.table(data);
+    console.log(data[1].metadata);
+    if (error) {
+      console.error("couldnt get shared files", error);
+      return res.sendStatus(500);
+    }
+
+    for (const file of data) {
+      const filePath = `${req.user.id}/${file.name}`;
+
+      const signedUrlData = supabase.storage
+        .from("share")
+        .getPublicUrl(filePath, { download: true });
+
+      file.metadata.signedUrl = signedUrlData.data.publicUrl;
+    }
+    return res.json(data);
+  } catch (error) {
+    console.error("error while trying to get shared files", error);
+  }
+}
+
+export async function share_file(req: Request, res: Response) {
+  console.log(req.fileName);
+  console.log(req.folderId);
+  console.log(req.body);
+
+  const { fileName, folderId } = req.body;
+
+  if (!fileName || !folderId) return res.sendStatus(400);
+
+  const supabase = getSupabaseClient(req.user);
+
+  try {
+    const folder = await prisma.folder.findUnique({
+      where: { id: folderId },
+    });
+
+    if (!folder) return res.sendStatus(400);
+
+    const { error, data } = await supabase.storage
+      .from("folders")
+      .copy(
+        `${req.user.id}/${folder.name}/${fileName}`,
+        `${req.user.id}/${fileName}`,
+        {
+          destinationBucket: "share",
+        },
+      );
+
+    if (error) {
+      if (error.name === "StorageApiError") {
+        return res.json({ error: "File already shared" });
+      }
+      console.error("couldnt upload file", error);
+      return res.sendStatus(500);
+    }
+
+    console.log("file created", data);
+
+    const publicUrl = supabase.storage
+      .from("share")
+      .getPublicUrl(data.path.substring(6)); // 6 deletes the first 6 characters from the path "share/"
+    return res.json({ publicUrl: publicUrl.data.publicUrl });
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+}
+
 export async function index(req: Request, res: Response) {
   const files = ["file", "file", "file"];
   return res.render("files", { files: files });

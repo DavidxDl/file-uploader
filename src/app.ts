@@ -11,6 +11,7 @@ import cors from "cors";
 
 import { router as filesRouter } from "./routes/files";
 import { router as foldersRouter } from "./routes/folders";
+import { router as shareRouter } from "./routes/share";
 import loginRequired from "./utilities/loginRequired";
 
 const prisma = new PrismaClient();
@@ -22,7 +23,7 @@ app.use(
   cors({
     origin: "http://localhost:5173", // Your React app's exact URL
     credentials: true, // This is crucial for sending cookies
-  })
+  }),
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -44,7 +45,7 @@ app.use(
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),
-  })
+  }),
 );
 app.use(passport.session());
 
@@ -66,8 +67,8 @@ passport.use(
       } catch (err) {
         return done(err);
       }
-    }
-  )
+    },
+  ),
 );
 
 passport.serializeUser((user: User, done) => {
@@ -85,6 +86,7 @@ passport.deserializeUser(async (id: string, done) => {
 
 app.use("/files", filesRouter);
 app.use("/folders", foldersRouter);
+app.use("/share", shareRouter);
 
 app.get("/", (req, res) => {
   return res.render("index", { user: req.user });
