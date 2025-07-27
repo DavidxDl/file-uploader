@@ -36,6 +36,8 @@ app.use(
   session({
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // ms
+      secure: true,
+      sameSite: "none",
     },
     secret: "dogs",
     resave: true,
