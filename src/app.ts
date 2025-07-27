@@ -21,7 +21,7 @@ const app = express();
 // Configure CORS with specific options
 app.use(
   cors({
-    origin: "http://localhost:5173", // Your React app's exact URL
+    origin: process.env.FRONTEND_URL, // Your React app's exact URL
     credentials: true, // This is crucial for sending cookies
   }),
 );
