@@ -41,10 +41,11 @@ app.use(
       maxAge: 7 * 24 * 60 * 60 * 1000, // ms
       secure: true,
       sameSite: "none",
+      httpOnly: true,
     },
-    secret: "dogs",
+    secret: process.env.SESSION_SECRET || "dogs",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: new PrismaSessionStore(new PrismaClient(), {
       checkPeriod: 2 * 60 * 1000, //ms
       dbRecordIdIsSessionId: true,
@@ -66,7 +67,7 @@ passport.use(
         if (!user) {
           return done(null, false, { message: "Incorrect username" });
         }
-        const match = bcrypt.compare(password, user.password);
+        const match = await bcrypt.compare(password, user.password);
         if (!match) {
           return done(null, false, { message: "Incorrect password" });
         }
