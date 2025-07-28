@@ -36,13 +36,14 @@ app.use(express.static("public"));
 
 app.use(
   session({
+    name: "connect.sid",
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // ms
       secure: true,
       sameSite: "none",
     },
     secret: "dogs",
-    resave: true,
+    resave: false,
     saveUninitialized: true,
     store: new PrismaSessionStore(new PrismaClient(), {
       checkPeriod: 2 * 60 * 1000, //ms
