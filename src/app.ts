@@ -25,6 +25,8 @@ app.use(
     credentials: true, // This is crucial for sending cookies
   }),
 );
+app.set("trust proxy", 1); // Trust the first proxy (Render)
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
